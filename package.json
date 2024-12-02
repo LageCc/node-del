@@ -6,6 +6,5 @@
   "scripts": {},
   "author": "",
   "license": "ISC",
-  "bin": "index.js",
-  "outputPath‌": "./dist"
+  "bin": "index.js"
 }
