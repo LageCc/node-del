@@ -1,9 +1,11 @@
 {
-  "name": "delfile_script",
+  "name": "delfile",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "pkg": "pkg . --out-path dist"
+  },
   "author": "",
   "license": "ISC",
   "bin": "index.js"
