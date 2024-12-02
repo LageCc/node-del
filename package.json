@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "pkg": "pkg . --out-path dist"
+    "pkg": "pkg . --out-path dist --compress GZip"
   },
   "author": "",
   "license": "ISC",
