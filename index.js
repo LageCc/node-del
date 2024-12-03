@@ -1,5 +1,5 @@
 const fs = require('fs');
-var time = 1
+var time = 24
 init = () => {
     // 默认配置
     if (!isExist('config.json')) {
@@ -14,30 +14,24 @@ init = () => {
             fileName: "config.json"
         });
     }
-
     if (!isExist('err.txt')) {
         createFile({
             content: '',
             fileName: 'err.txt'
         });
     }
-
     if (!isExist('log.txt')) {
         createFile({
             content: '',
             fileName: 'log.txt'
         });
     }
-
     // 读取文件
     const str = fs.readFileSync('config.json', 'utf-8');
     const { del } = JSON.parse(str)
-
     if (del.time) {
         time = del.time
     }
-
-
     if (del.path.length == 0) {
         writeFile({
             content: 'config.del.path中配置文件路径',
@@ -45,7 +39,6 @@ init = () => {
         });
         return;
     }
-
     if (del.format.length == 0) {
         writeFile({
             content: 'config.del.format中配置文件格式',
@@ -53,19 +46,19 @@ init = () => {
         });
         return;
     }
-
     for (let i = 0; i < del.path.length; i++) {
-        getFiles(del.path[i], del.format, delFile);
+        getFiles(replacePath(del.path[i]), del.format, delFile);
     }
-
 }
-
+// windows下路径 \ 转换为 /
+replacePath = (path) => {
+    return path.replace(/\\/g, '/');
+}
 // 判断文件是否存在
 isExist = (path) => {
     // 同步判断文件是否存在
     return fs.existsSync(path);
 }
-
 delFile = (path, files) => {
     if (files.length == 0) {
         return;
@@ -76,11 +69,11 @@ delFile = (path, files) => {
         const fileDate = fileInfo.birthtime.getTime();
         const now = new Date().getTime();
         // 配置文件删除时间
-        const delTime = Number(time) * (24 * 60 * 60 * 1000);
-        console.log('delTime', delTime);
-        console.log('now - fileDate', now - fileDate);
-
-
+        const delTime = Number(time) * (60 * 60 * 1000);
+        writeFile({
+            content: 'delTime' + delTime + ' now - fileDate' + (now - fileDate),
+            fileName: 'log.txt'
+        })
         // 根据time的时间保留文件
         if (now - fileDate > delTime) {
             // 同步删除文件
@@ -99,10 +92,7 @@ delFile = (path, files) => {
             })
         }
     }
-
-
 }
-
 // 获取文件
 getFiles = (path, format, callback) => {
     for (let i = 0; i < format.length; i++) {
@@ -110,26 +100,20 @@ getFiles = (path, format, callback) => {
         const files = fs.readdirSync(path).filter(file => file.endsWith(format[i]));
         callback(path, files);
     }
-
 }
-
-// 获取文件信息
 getFileInfo = (path) => {
     // 同步获取文件信息
     return fs.statSync(path);
-
 }
-
 // 创建文件
 createFile = ({ fileName, content }) => {
     // 同步创建文件
     fs.writeFileSync(fileName, content);
 }
-
 // 写入
 writeFile = ({ fileName, content }) => {
     if (isExist(fileName)) {
-        const text = new Date().toLocaleString() + ' ' + content + '\n';
+        const text = new Date().toLocaleString('zh') + ' ' + content + '\n';
 
         // 文件末尾追加内容
         fs.appendFile(fileName, text, (err) => {
@@ -140,8 +124,4 @@ writeFile = ({ fileName, content }) => {
     }
 
 }
-
 init()
-
-
-
