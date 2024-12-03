@@ -47,12 +47,8 @@ init = () => {
         return;
     }
     for (let i = 0; i < del.path.length; i++) {
-        getFiles(replacePath(del.path[i]), del.format, delFile);
+        getFiles(del.path[i], del.format, delFile);
     }
-}
-// windows下路径 \ 转换为 /
-replacePath = (path) => {
-    return path.replace(/\\/g, '/');
 }
 // 判断文件是否存在
 isExist = (path) => {
