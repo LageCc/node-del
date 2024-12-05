@@ -1,53 +1,63 @@
 const fs = require('fs');
 var time = 24
+
 init = () => {
-    // 默认配置
-    if (!isExist('config.json')) {
-        createFile({
-            content: `{
+    try {
+        // 默认配置
+        if (!isExist('config.json')) {
+            createFile({
+                content: `{
             "del": {
                 "path": [],
                 "format": [".ts"],
                 "time": 1
                 }
             }`,
-            fileName: "config.json"
-        });
-    }
-    if (!isExist('err.txt')) {
-        createFile({
-            content: '',
-            fileName: 'err.txt'
-        });
-    }
-    if (!isExist('log.txt')) {
-        createFile({
-            content: '',
-            fileName: 'log.txt'
-        });
-    }
-    // 读取文件
-    const str = fs.readFileSync('config.json', 'utf-8');
-    const { del } = JSON.parse(str)
-    if (del.time) {
-        time = del.time
-    }
-    if (del.path.length == 0) {
+                fileName: "config.json"
+            });
+        }
+        if (!isExist('err.txt')) {
+            createFile({
+                content: '',
+                fileName: 'err.txt'
+            });
+        }
+        if (!isExist('log.txt')) {
+            createFile({
+                content: '',
+                fileName: 'log.txt'
+            });
+        }
+
+
+        // 读取文件
+        const str = fs.readFileSync('config.json', 'utf8');
+        const { del } = JSON.parse(str)
+        if (del.time || del.time == 0) {
+            time = del.time
+        }
+        if (del.path.length == 0) {
+            writeFile({
+                content: 'config.del.path中配置文件路径',
+                fileName: 'err.txt'
+            });
+            return;
+        }
+        if (del.format.length == 0) {
+            writeFile({
+                content: 'config.del.format中配置文件格式',
+                fileName: 'err.txt'
+            });
+            return;
+        }
+        for (let i = 0; i < del.path.length; i++) {
+            getFiles(del.path[i], del.format, delFile);
+        }
+    } catch (error) {
         writeFile({
-            content: 'config.del.path中配置文件路径',
+            content: error,
             fileName: 'err.txt'
         });
-        return;
-    }
-    if (del.format.length == 0) {
-        writeFile({
-            content: 'config.del.format中配置文件格式',
-            fileName: 'err.txt'
-        });
-        return;
-    }
-    for (let i = 0; i < del.path.length; i++) {
-        getFiles(del.path[i], del.format, delFile);
     }
 }
 // 判断文件是否存在
@@ -66,6 +76,8 @@ delFile = (path, files) => {
         const now = new Date().getTime();
         // 配置文件删除时间
         const delTime = Number(time) * (60 * 60 * 1000);
+        console.log(delTime);
+
         writeFile({
             content: 'delTime' + delTime + ' now - fileDate' + (now - fileDate),
             fileName: 'log.txt'
@@ -94,6 +106,8 @@ getFiles = (path, format, callback) => {
     for (let i = 0; i < format.length; i++) {
         // 同步获取 format[i] 格式的文件
         const files = fs.readdirSync(path).filter(file => file.endsWith(format[i]));
+        console.log(files);
+
         callback(path, files);
     }
 }
@@ -120,4 +134,7 @@ writeFile = ({ fileName, content }) => {
     }
 
 }
+
 init()
+
+
