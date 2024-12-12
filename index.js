@@ -65,6 +65,8 @@ isExist = (path) => {
     // 同步判断文件是否存在
     return fs.existsSync(path);
 }
+
+// 删除文件
 delFile = (path, files) => {
     if (files.length == 0) {
         return;
@@ -76,17 +78,10 @@ delFile = (path, files) => {
         const now = new Date().getTime();
         // 配置文件删除时间
         const delTime = Number(time) * (60 * 60 * 1000);
-        console.log(delTime);
-
-        writeFile({
-            content: 'delTime' + delTime + ' now - fileDate' + (now - fileDate),
-            fileName: 'log.txt'
-        })
         // 根据time的时间保留文件
         if (now - fileDate > delTime) {
             // 同步删除文件
             const state = fs.unlinkSync(filePath);
-
             if (state) {
                 writeFile({
                     content: filePath + ' 删除失败',
@@ -120,6 +115,7 @@ createFile = ({ fileName, content }) => {
     // 同步创建文件
     fs.writeFileSync(fileName, content);
 }
+
 // 写入
 writeFile = ({ fileName, content }) => {
     if (isExist(fileName)) {
